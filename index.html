@@ -47,23 +47,24 @@
     <b>How to use this:</b> fill in account info, then add a row per company, per stakeholder, and per relationship
     that isn't a reporting line (a personal relationship, a prior vendor relationship, an ownership tie, etc).
     "Reports to" and "Person A/B" fields autocomplete from names you've already entered below — that's what tells
-    Claude where to draw solid reporting arrows versus dashed relationship lines. Rows marked <i>EXAMPLE</i> show the
-    685 Third Avenue / BGO chart built earlier — delete them (✕) or overwrite the fields, then add your own. When
-    you're done, click <b>Copy prompt for Claude</b> and paste it into a chat with: "build an org chart from this."
+    Claude where to draw solid reporting arrows versus dashed relationship lines. Rows marked <i>EXAMPLE</i> show a
+    generic sample account so you can see how the fields work — delete them (✕) or overwrite the fields, then add
+    your own. When you're done, click <b>Copy prompt for Claude</b> and paste it into a chat with: "build an org
+    chart from this."
   </div>
 
   <details class="howto-collapse">
     <summary>Researching stakeholders you haven't engaged yet</summary>
     <ol>
       <li>Check the company's own leadership / about / team page first. It's the highest-confidence source for
-      titles, scope, and location — this is how Rob Naso and Jonathan Epstein turned up for BGO.</li>
+      titles, scope, and location.</li>
       <li>Search "[company] + [likely function]" (e.g. "asset management", "property technology", "innovation") to
       surface people who aren't on the leadership page, via LinkedIn, press releases, and aggregator sites
       (RocketReach, ZoomInfo, etc.).</li>
       <li>Use title hierarchy to infer a reporting line only when nothing states it directly — and mark it as
       inferred, not confirmed, in the Notes column.</li>
       <li>Check press releases and news for explicit "reporting to" language, and M&amp;A / ownership announcements
-      for parent-company ties (that's how the Sun Life / BGO ownership link was confirmed).</li>
+      for parent-company ties.</li>
       <li>Once your CRM/enrichment connectors (ZoomInfo, Apollo, HubSpot) are authorized, the same search-company
       then search-contacts pattern speeds this up for contact-level names beyond the leadership page.</li>
     </ol>
@@ -75,10 +76,10 @@
   <section>
     <h2>Account info</h2>
     <div class="grid2">
-      <label>Account / client name</label><input type="text" id="acct-name" placeholder="e.g. BGO (client) / JLL (property manager)">
-      <label>Deal or product</label><input type="text" id="acct-deal" placeholder="e.g. CBS implementation">
-      <label>Site(s) / property address(es)</label><input type="text" id="acct-sites" placeholder="e.g. 685 Third Avenue, NYC; 200 W Madison, Chicago">
-      <label>R-Zero owner(s)</label><input type="text" id="acct-owners" placeholder="e.g. Byron Avery, Nick Viscuso">
+      <label>Account / client name</label><input type="text" id="acct-name" placeholder="e.g. Acme Holdings (client) / Meridian Property Management">
+      <label>Deal or product</label><input type="text" id="acct-deal" placeholder="e.g. product or service implementation">
+      <label>Site(s) / property address(es)</label><input type="text" id="acct-sites" placeholder="e.g. 123 Main St, Chicago">
+      <label>R-Zero owner(s)</label><input type="text" id="acct-owners" placeholder="e.g. your name, teammate's name">
       <label>Purpose of this chart</label><input type="text" id="acct-purpose" placeholder="e.g. Solutions team kickoff">
       <label>Date prepared</label><input type="date" id="acct-date">
     </div>
@@ -259,16 +260,16 @@ function copyForClaude() {
   navigator.clipboard.writeText(out).then(() => showToast('Copied — paste into a Claude chat.'));
 }
 
-// Seed with the 685 Third / BGO example, matching the Excel template
-addCompanyRow({ name: 'BGO (EXAMPLE)', color: 'Purple', parent: 'Sun Life Financial', parentLoc: 'Toronto', notes: 'Ultimate parent — dashed boundary, not a reporting line' }, true);
-addCompanyRow({ name: 'JLL (EXAMPLE)', color: 'Blue', notes: 'Third-party property manager for BGO' }, true);
-addCompanyRow({ name: 'R-Zero (EXAMPLE)', color: 'Gray', notes: "Not part of the client's hierarchy" }, true);
+// Seed with a generic, made-up example — no real account or company names
+addCompanyRow({ name: 'Acme Holdings (EXAMPLE)', color: 'Purple', parent: 'Acme Global Inc.', parentLoc: 'Chicago', notes: 'Ultimate parent — dashed boundary, not a reporting line' }, true);
+addCompanyRow({ name: 'Meridian Property Management (EXAMPLE)', color: 'Blue', notes: 'Third-party property manager for Acme Holdings' }, true);
+addCompanyRow({ name: 'Your Company (EXAMPLE)', color: 'Gray', notes: "Not part of the client's hierarchy — this is you" }, true);
 
-addStakeholderRow({ name: 'Chris Gildea (EXAMPLE)', title: 'Portfolio Manager', company: 'JLL (EXAMPLE)', location: 'New York', site: '685 Third Ave & 200 W Madison', tag: 'R-Zero champion', notes: "Top of the JLL chain shown here" }, true);
-addStakeholderRow({ name: 'Catherine Ortiz (EXAMPLE)', title: 'Property Manager', company: 'JLL (EXAMPLE)', location: 'New York', site: '685 Third Ave', reportsTo: 'Chris Gildea (EXAMPLE)', notes: "'Reports to' matches the name above exactly" }, true);
-addStakeholderRow({ name: 'Nick Viscuso (EXAMPLE)', title: 'Account Owner', company: 'R-Zero (EXAMPLE)', location: 'New York', notes: 'Only appears via a Relationships-tab connector' }, true);
+addStakeholderRow({ name: 'Jane Doe (EXAMPLE)', title: 'Portfolio Manager', company: 'Meridian Property Management (EXAMPLE)', location: 'Chicago', site: '123 Main St', tag: 'Champion', notes: "Top of the property manager's chain shown here" }, true);
+addStakeholderRow({ name: 'John Smith (EXAMPLE)', title: 'Property Manager', company: 'Meridian Property Management (EXAMPLE)', location: 'Chicago', site: '123 Main St', reportsTo: 'Jane Doe (EXAMPLE)', notes: "'Reports to' matches the name above exactly" }, true);
+addStakeholderRow({ name: 'Alex Rivera (EXAMPLE)', title: 'Account Owner', company: 'Your Company (EXAMPLE)', location: 'Chicago', notes: 'Only appears via a Relationships-tab connector' }, true);
 
-addRelationshipRow({ a: 'Chris Gildea (EXAMPLE)', b: 'Nick Viscuso (EXAMPLE)', type: 'Personal relationship', label: 'Strong working relationship', notes: 'Draws as a dashed line, not an arrow' }, true);
+addRelationshipRow({ a: 'Jane Doe (EXAMPLE)', b: 'Alex Rivera (EXAMPLE)', type: 'Personal relationship', label: 'Strong working relationship', notes: 'Draws as a dashed line, not an arrow' }, true);
 
 refreshLists();
 </script>
