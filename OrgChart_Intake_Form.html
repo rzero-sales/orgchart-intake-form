@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Org Chart Intake Form</title>
+<style>
+  * { box-sizing: border-box; }
+  body { font-family: -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; background: #f7f7f5; margin: 0; padding: 32px 20px 80px; color: #1a1a1a; }
+  .wrap { max-width: 980px; margin: 0 auto; }
+  h1 { font-size: 21px; font-weight: 600; margin: 0 0 4px; }
+  p.sub { font-size: 14px; color: #6b6b68; margin: 0 0 20px; }
+  .howto { background: #fff; border: 1px solid #e4e2dc; border-radius: 10px; padding: 16px 20px; font-size: 13px; color: #444441; line-height: 1.6; margin-bottom: 28px; }
+  .howto b { color: #1a1a1a; }
+  section { background: #fff; border: 1px solid #e4e2dc; border-radius: 12px; padding: 20px 22px; margin-bottom: 22px; }
+  section h2 { font-size: 15px; font-weight: 600; margin: 0 0 4px; }
+  section p.hint { font-size: 12px; color: #888780; margin: 0 0 14px; }
+  .grid2 { display: grid; grid-template-columns: 220px 1fr; gap: 10px 16px; align-items: center; }
+  .grid2 label { font-size: 13px; font-weight: 600; }
+  input[type=text], input[type=date], select, textarea {
+    font-family: inherit; font-size: 13px; padding: 6px 8px; border: 1px solid #d3d1c7; border-radius: 6px; width: 100%;
+  }
+  table { width: 100%; border-collapse: collapse; margin-top: 8px; }
+  th { text-align: left; font-size: 11px; text-transform: uppercase; letter-spacing: 0.02em; color: #6b6b68; padding: 6px 6px; border-bottom: 1px solid #e4e2dc; }
+  td { padding: 4px 6px; vertical-align: top; }
+  tr.example td input, tr.example td select { background: #f7f7f5; color: #888780; font-style: italic; }
+  .rm-btn { background: none; border: none; color: #a32d2d; font-size: 15px; cursor: pointer; padding: 4px 6px; }
+  .add-btn { margin-top: 10px; background: #1d4321; color: #fff; border: none; border-radius: 6px; padding: 7px 14px; font-size: 13px; cursor: pointer; }
+  .add-btn:hover { background: #163419; }
+  .swatch { display: inline-block; width: 12px; height: 12px; border-radius: 3px; margin-left: 6px; vertical-align: middle; border: 1px solid rgba(0,0,0,0.15); }
+  .export-bar { display: flex; gap: 12px; margin-top: 8px; }
+  .export-btn { background: #185FA5; color: #fff; border: none; border-radius: 6px; padding: 10px 18px; font-size: 14px; cursor: pointer; }
+  .export-btn.secondary { background: #534AB7; }
+  .export-btn:hover { opacity: 0.9; }
+  .toast { display: none; margin-top: 10px; font-size: 13px; color: #0f6e56; font-weight: 600; }
+  details.howto-collapse { background: #fff; border: 1px solid #e4e2dc; border-radius: 10px; padding: 4px 20px 16px; margin-bottom: 28px; }
+  details.howto-collapse summary { cursor: pointer; font-size: 13px; font-weight: 600; padding: 12px 0; color: #1a1a1a; }
+  details.howto-collapse ol { font-size: 13px; color: #444441; line-height: 1.6; margin: 6px 0 8px 0; padding-left: 20px; }
+  details.howto-collapse p { font-size: 12px; color: #888780; margin: 8px 0 0; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Org chart intake form</h1>
+  <p class="sub">Fill this out for any account or deal that needs a stakeholder org chart, then export and hand it to Claude.</p>
+
+  <div class="howto">
+    <b>How to use this:</b> fill in account info, then add a row per company, per stakeholder, and per relationship
+    that isn't a reporting line (a personal relationship, a prior vendor relationship, an ownership tie, etc).
+    "Reports to" and "Person A/B" fields autocomplete from names you've already entered below — that's what tells
+    Claude where to draw solid reporting arrows versus dashed relationship lines. Rows marked <i>EXAMPLE</i> show the
+    685 Third Avenue / BGO chart built earlier — delete them (✕) or overwrite the fields, then add your own. When
+    you're done, click <b>Copy prompt for Claude</b> and paste it into a chat with: "build an org chart from this."
+  </div>
+
+  <details class="howto-collapse">
+    <summary>Researching stakeholders you haven't engaged yet</summary>
+    <ol>
+      <li>Check the company's own leadership / about / team page first. It's the highest-confidence source for
+      titles, scope, and location — this is how Rob Naso and Jonathan Epstein turned up for BGO.</li>
+      <li>Search "[company] + [likely function]" (e.g. "asset management", "property technology", "innovation") to
+      surface people who aren't on the leadership page, via LinkedIn, press releases, and aggregator sites
+      (RocketReach, ZoomInfo, etc.).</li>
+      <li>Use title hierarchy to infer a reporting line only when nothing states it directly — and mark it as
+      inferred, not confirmed, in the Notes column.</li>
+      <li>Check press releases and news for explicit "reporting to" language, and M&amp;A / ownership announcements
+      for parent-company ties (that's how the Sun Life / BGO ownership link was confirmed).</li>
+      <li>Once your CRM/enrichment connectors (ZoomInfo, Apollo, HubSpot) are authorized, the same search-company
+      then search-contacts pattern speeds this up for contact-level names beyond the leadership page.</li>
+    </ol>
+    <p>Prefer to have Claude do this research first? Use the companion "Account Org Research Prompt" document —
+    paste it into a chat, fill in the account name and what you already know, and Claude will hand back a
+    pre-filled row set (Companies / Stakeholders / Relationships) ready to drop into this form.</p>
+  </details>
+
+  <section>
+    <h2>Account info</h2>
+    <div class="grid2">
+      <label>Account / client name</label><input type="text" id="acct-name" placeholder="e.g. BGO (client) / JLL (property manager)">
+      <label>Deal or product</label><input type="text" id="acct-deal" placeholder="e.g. CBS implementation">
+      <label>Site(s) / property address(es)</label><input type="text" id="acct-sites" placeholder="e.g. 685 Third Avenue, NYC; 200 W Madison, Chicago">
+      <label>R-Zero owner(s)</label><input type="text" id="acct-owners" placeholder="e.g. Byron Avery, Nick Viscuso">
+      <label>Purpose of this chart</label><input type="text" id="acct-purpose" placeholder="e.g. Solutions team kickoff">
+      <label>Date prepared</label><input type="date" id="acct-date">
+    </div>
+  </section>
+
+  <section>
+    <h2>Companies</h2>
+    <p class="hint">One row per company shown on the chart. Pick a color per company for consistent chart coloring. If a company is owned by a parent firm, note it here — it draws as a dashed boundary with an ownership note, never a reporting line.</p>
+    <table id="companies-table">
+      <thead><tr><th style="width:18%">Company name</th><th style="width:14%">Color</th><th style="width:18%">Parent company</th><th style="width:14%">Parent location</th><th>Notes</th><th></th></tr></thead>
+      <tbody></tbody>
+    </table>
+    <button class="add-btn" onclick="addCompanyRow()">+ Add company</button>
+  </section>
+
+  <section>
+    <h2>Stakeholders</h2>
+    <p class="hint">One row per person. "Reports to" must match another name in this table exactly — that draws the solid reporting arrow. Leave blank for the top of a chain, or for someone who only appears via a relationship line. Keep tag/label to 2-3 words — it goes right on the chart.</p>
+    <table id="stakeholders-table">
+      <thead><tr><th style="width:13%">Name</th><th style="width:13%">Title / role</th><th style="width:10%">Company</th><th style="width:10%">Location</th><th style="width:11%">Site / property</th><th style="width:12%">Reports to</th><th style="width:11%">Tag / label</th><th>Notes</th><th></th></tr></thead>
+      <tbody></tbody>
+    </table>
+    <button class="add-btn" onclick="addStakeholderRow()">+ Add stakeholder</button>
+  </section>
+
+  <section>
+    <h2>Relationships</h2>
+    <p class="hint">Anything that is NOT a reporting line — a strong personal relationship, a prior vendor relationship, an ownership tie. These draw as dashed connectors, not arrows.</p>
+    <table id="relationships-table">
+      <thead><tr><th style="width:16%">Person A</th><th style="width:16%">Person B</th><th style="width:18%">Relationship type</th><th style="width:18%">Label (short)</th><th>Notes</th><th></th></tr></thead>
+      <tbody></tbody>
+    </table>
+    <button class="add-btn" onclick="addRelationshipRow()">+ Add relationship</button>
+  </section>
+
+  <datalist id="companies-list"></datalist>
+  <datalist id="stakeholders-list"></datalist>
+
+  <section>
+    <h2>Export</h2>
+    <p class="hint">Download the raw data, or copy a ready-to-paste prompt for Claude.</p>
+    <div class="export-bar">
+      <button class="export-btn" onclick="copyForClaude()">Copy prompt for Claude</button>
+      <button class="export-btn secondary" onclick="downloadJSON()">Download JSON</button>
+    </div>
+    <div class="toast" id="toast">Copied to clipboard.</div>
+  </section>
+</div>
+
+<script>
+const COLORS = { Purple: "#7F77DD", Blue: "#378ADD", Teal: "#5DCAA5", Coral: "#F0997B", Gray: "#B4B2A9", Amber: "#EF9F27", Green: "#97C459", Red: "#F09595", Pink: "#ED93B1" };
+const REL_TYPES = ["Personal relationship", "Ownership or parent company", "Other"];
+
+function colorSelectHTML(selected) {
+  let opts = '<option value=""></option>';
+  for (const c in COLORS) opts += `<option value="${c}" ${c===selected?'selected':''}>${c}</option>`;
+  return opts;
+}
+function relTypeSelectHTML(selected) {
+  let opts = '<option value=""></option>';
+  REL_TYPES.forEach(t => opts += `<option value="${t}" ${t===selected?'selected':''}>${t}</option>`);
+  return opts;
+}
+function swatchFor(select) {
+  const span = select.parentElement.querySelector('.swatch');
+  span.style.background = COLORS[select.value] || 'transparent';
+}
+
+function addCompanyRow(vals, isExample) {
+  vals = vals || {};
+  const tbody = document.querySelector('#companies-table tbody');
+  const tr = document.createElement('tr');
+  if (isExample) tr.className = 'example';
+  tr.innerHTML = `
+    <td><input type="text" class="company-name" value="${vals.name||''}" oninput="refreshLists()"></td>
+    <td><select onchange="swatchFor(this); refreshLists()">${colorSelectHTML(vals.color)}</select><span class="swatch" style="background:${COLORS[vals.color]||'transparent'}"></span></td>
+    <td><input type="text" value="${vals.parent||''}"></td>
+    <td><input type="text" value="${vals.parentLoc||''}"></td>
+    <td><input type="text" value="${vals.notes||''}"></td>
+    <td><button class="rm-btn" onclick="this.closest('tr').remove(); refreshLists()">✕</button></td>`;
+  tbody.appendChild(tr);
+  refreshLists();
+}
+
+function addStakeholderRow(vals, isExample) {
+  vals = vals || {};
+  const tbody = document.querySelector('#stakeholders-table tbody');
+  const tr = document.createElement('tr');
+  if (isExample) tr.className = 'example';
+  tr.innerHTML = `
+    <td><input type="text" class="stakeholder-name" value="${vals.name||''}" oninput="refreshLists()"></td>
+    <td><input type="text" value="${vals.title||''}"></td>
+    <td><input type="text" list="companies-list" value="${vals.company||''}"></td>
+    <td><input type="text" value="${vals.location||''}"></td>
+    <td><input type="text" value="${vals.site||''}"></td>
+    <td><input type="text" list="stakeholders-list" value="${vals.reportsTo||''}"></td>
+    <td><input type="text" value="${vals.tag||''}"></td>
+    <td><input type="text" value="${vals.notes||''}"></td>
+    <td><button class="rm-btn" onclick="this.closest('tr').remove(); refreshLists()">✕</button></td>`;
+  tbody.appendChild(tr);
+  refreshLists();
+}
+
+function addRelationshipRow(vals, isExample) {
+  vals = vals || {};
+  const tbody = document.querySelector('#relationships-table tbody');
+  const tr = document.createElement('tr');
+  if (isExample) tr.className = 'example';
+  tr.innerHTML = `
+    <td><input type="text" list="stakeholders-list" value="${vals.a||''}"></td>
+    <td><input type="text" list="stakeholders-list" value="${vals.b||''}"></td>
+    <td><select>${relTypeSelectHTML(vals.type)}</select></td>
+    <td><input type="text" value="${vals.label||''}"></td>
+    <td><input type="text" value="${vals.notes||''}"></td>
+    <td><button class="rm-btn" onclick="this.closest('tr').remove()">✕</button></td>`;
+  tbody.appendChild(tr);
+}
+
+function refreshLists() {
+  const cList = document.getElementById('companies-list');
+  cList.innerHTML = '';
+  document.querySelectorAll('.company-name').forEach(inp => {
+    if (inp.value.trim()) { const o = document.createElement('option'); o.value = inp.value.trim(); cList.appendChild(o); }
+  });
+  const sList = document.getElementById('stakeholders-list');
+  sList.innerHTML = '';
+  document.querySelectorAll('.stakeholder-name').forEach(inp => {
+    if (inp.value.trim()) { const o = document.createElement('option'); o.value = inp.value.trim(); sList.appendChild(o); }
+  });
+}
+
+function collectData() {
+  const val = id => document.getElementById(id).value;
+  const companies = [...document.querySelectorAll('#companies-table tbody tr')].map(tr => {
+    const i = tr.querySelectorAll('input, select');
+    return { name: i[0].value, color: i[1].value, parentCompany: i[2].value, parentLocation: i[3].value, notes: i[4].value, example: tr.classList.contains('example') };
+  }).filter(r => r.name && !r.example);
+  const stakeholders = [...document.querySelectorAll('#stakeholders-table tbody tr')].map(tr => {
+    const i = tr.querySelectorAll('input, select');
+    return { name: i[0].value, title: i[1].value, company: i[2].value, location: i[3].value, site: i[4].value, reportsTo: i[5].value, tag: i[6].value, notes: i[7].value, example: tr.classList.contains('example') };
+  }).filter(r => r.name && !r.example);
+  const relationships = [...document.querySelectorAll('#relationships-table tbody tr')].map(tr => {
+    const i = tr.querySelectorAll('input, select');
+    return { personA: i[0].value, personB: i[1].value, type: i[2].value, label: i[3].value, notes: i[4].value, example: tr.classList.contains('example') };
+  }).filter(r => r.personA && r.personB && !r.example);
+  return {
+    account: { name: val('acct-name'), deal: val('acct-deal'), sites: val('acct-sites'), owners: val('acct-owners'), purpose: val('acct-purpose'), date: val('acct-date') },
+    companies, stakeholders, relationships
+  };
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.style.display = 'block';
+  setTimeout(() => t.style.display = 'none', 2500);
+}
+
+function downloadJSON() {
+  const data = collectData();
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = (data.account.name || 'orgchart-intake').replace(/[^a-z0-9]+/gi, '_') + '.json';
+  a.click();
+  showToast('JSON downloaded.');
+}
+
+function copyForClaude() {
+  const d = collectData();
+  let out = 'Build an org chart from this intake:\n\n';
+  out += `Account: ${d.account.name}\nDeal: ${d.account.deal}\nSite(s): ${d.account.sites}\nR-Zero owner(s): ${d.account.owners}\nPurpose: ${d.account.purpose}\n\n`;
+  out += 'Companies:\n';
+  d.companies.forEach(c => out += `- ${c.name} (${c.color})${c.parentCompany ? `, owned by ${c.parentCompany}${c.parentLocation ? ' in ' + c.parentLocation : ''}` : ''}${c.notes ? ' — ' + c.notes : ''}\n`);
+  out += '\nStakeholders:\n';
+  d.stakeholders.forEach(s => out += `- ${s.name}, ${s.title}, ${s.company}${s.location ? ', ' + s.location : ''}${s.site ? ` (${s.site})` : ''}${s.reportsTo ? `, reports to ${s.reportsTo}` : ', top of chain'}${s.tag ? ` [${s.tag}]` : ''}${s.notes ? ' — ' + s.notes : ''}\n`);
+  out += '\nRelationships (not reporting lines):\n';
+  d.relationships.forEach(r => out += `- ${r.personA} <-> ${r.personB}: ${r.type}${r.label ? ', "' + r.label + '"' : ''}${r.notes ? ' — ' + r.notes : ''}\n`);
+  navigator.clipboard.writeText(out).then(() => showToast('Copied — paste into a Claude chat.'));
+}
+
+// Seed with the 685 Third / BGO example, matching the Excel template
+addCompanyRow({ name: 'BGO (EXAMPLE)', color: 'Purple', parent: 'Sun Life Financial', parentLoc: 'Toronto', notes: 'Ultimate parent — dashed boundary, not a reporting line' }, true);
+addCompanyRow({ name: 'JLL (EXAMPLE)', color: 'Blue', notes: 'Third-party property manager for BGO' }, true);
+addCompanyRow({ name: 'R-Zero (EXAMPLE)', color: 'Gray', notes: "Not part of the client's hierarchy" }, true);
+
+addStakeholderRow({ name: 'Chris Gildea (EXAMPLE)', title: 'Portfolio Manager', company: 'JLL (EXAMPLE)', location: 'New York', site: '685 Third Ave & 200 W Madison', tag: 'R-Zero champion', notes: "Top of the JLL chain shown here" }, true);
+addStakeholderRow({ name: 'Catherine Ortiz (EXAMPLE)', title: 'Property Manager', company: 'JLL (EXAMPLE)', location: 'New York', site: '685 Third Ave', reportsTo: 'Chris Gildea (EXAMPLE)', notes: "'Reports to' matches the name above exactly" }, true);
+addStakeholderRow({ name: 'Nick Viscuso (EXAMPLE)', title: 'Account Owner', company: 'R-Zero (EXAMPLE)', location: 'New York', notes: 'Only appears via a Relationships-tab connector' }, true);
+
+addRelationshipRow({ a: 'Chris Gildea (EXAMPLE)', b: 'Nick Viscuso (EXAMPLE)', type: 'Personal relationship', label: 'Strong working relationship', notes: 'Draws as a dashed line, not an arrow' }, true);
+
+refreshLists();
+</script>
+</body>
+</html>
